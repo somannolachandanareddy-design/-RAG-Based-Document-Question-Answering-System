@@ -10,9 +10,9 @@ from functools import lru_cache
 from pathlib import Path
 from typing import List, Optional, Tuple
 import streamlit as st
-from dotenv import load_dotenv
 
-load_dotenv()
+
+
 BASE_DIR = Path(__file__).resolve().parent
 VECTOR_STORE_DIR = BASE_DIR / os.getenv("VECTOR_STORE_DIR", "vector_store")
 DOCUMENTS_DIR = BASE_DIR / os.getenv("DOCUMENTS_DIR", "documents")
@@ -20,8 +20,15 @@ LOGS_DIR = BASE_DIR / os.getenv("LOGS_DIR", "logs")
 for _d in (VECTOR_STORE_DIR, DOCUMENTS_DIR, LOGS_DIR):
     _d.mkdir(parents=True, exist_ok=True)
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
-GEMINI_CHAT_MODEL = os.getenv("GEMINI_CHAT_MODEL", "gemini-1.5-flash")
-GEMINI_EMBEDDING_MODEL = os.getenv("GEMINI_EMBEDDING_MODEL", "models/embedding-001")
+# NOTE: gemini-1.5-flash was retired by Google (returns 404 on every call).
+# gemini-2.5-flash is the current supported replacement.
+GEMINI_CHAT_MODEL = os.getenv("GEMINI_CHAT_MODEL", "gemini-2.5-flash")
+# NOTE: models/embedding-001 was also retired (404 on embedContent calls).
+# gemini-embedding-001 is the current supported embedding model.
+# IMPORTANT: it outputs 3072-dim vectors instead of the old 768-dim ones,
+# so any existing FAISS index built with the old model must be deleted
+# and rebuilt (use the "Reset index" button) before reprocessing PDFs.
+GEMINI_EMBEDDING_MODEL = os.getenv("GEMINI_EMBEDDING_MODEL", "models/gemini-embedding-001")
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "1000"))
 CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", "200"))
 TOP_K = int(os.getenv("TOP_K", "4"))

@@ -20,14 +20,8 @@ LOGS_DIR = BASE_DIR / os.getenv("LOGS_DIR", "logs")
 for _d in (VECTOR_STORE_DIR, DOCUMENTS_DIR, LOGS_DIR):
     _d.mkdir(parents=True, exist_ok=True)
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
-# NOTE: gemini-1.5-flash was retired by Google (returns 404 on every call).
-# gemini-2.5-flash is the current supported replacement.
 GEMINI_CHAT_MODEL = os.getenv("GEMINI_CHAT_MODEL", "gemini-2.5-flash")
-# NOTE: models/embedding-001 was also retired (404 on embedContent calls).
-# gemini-embedding-001 is the current supported embedding model.
-# IMPORTANT: it outputs 3072-dim vectors instead of the old 768-dim ones,
-# so any existing FAISS index built with the old model must be deleted
-# and rebuilt (use the "Reset index" button) before reprocessing PDFs.
+
 GEMINI_EMBEDDING_MODEL = os.getenv("GEMINI_EMBEDDING_MODEL", "models/gemini-embedding-001")
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE", "1000"))
 CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP", "200"))
@@ -399,6 +393,6 @@ if question:
                         )
                 st.caption(f"⏱️ {latency_ms:.0f} ms · {len(chunks)} sources")
                 st.session_state.history.add(question, answer, sources)
-            except Exception as exc:  # noqa: BLE001
+            except Exception as exc:  
                 logger.exception("Failed to answer question")
                 st.error(f"Something went wrong: {exc}")
